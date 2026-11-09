@@ -28,6 +28,10 @@ axios.get("https://data.moa.gov.tw/Service/OpenData/FromM/FarmTransData.aspx?IsT
     });
     showMessage("請輸入並搜尋想比價的作物名稱^＿^");
 })
+.catch(function(error){
+    console.log(error);
+    showMessage("資料讀取失敗，請稍後重新整理頁面");
+})
 }
 init();
 
@@ -77,31 +81,50 @@ function renderData(data,showAll){
 
 
 //切換分頁標籤
+// typeButton.addEventListener("click",function(e){
+    
+//     if(e.target.nodeName !== "BUTTON"){
+//         return
+//     }else if(e.target.textContent==="蔬菜"){
+//         // console.log("點到蔬菜區了喔")
+//         showData = allData.filter(function(item){
+//             return item.種類代碼 ==="N04"
+//         })
+//         renderData(showData);
+
+//     }else if(e.target.textContent==="水果"){
+//         console.log("點到水果區了喔")
+//         showData = allData.filter(function(item){
+//             return item.種類代碼 ==="N05"
+//         })
+//         renderData(showData);
+//     }else if(e.target.textContent==="花卉"){
+//         console.log("點到花卉區了喔")
+//         showData = allData.filter(function(item){
+//             return item.種類代碼 ==="N06"
+//         })
+//         renderData(showData);
+//     }
+    
+// })
+
+//(已修改)切換分頁標籤
 typeButton.addEventListener("click",function(e){
     
     if(e.target.nodeName !== "BUTTON"){
         return
-    }else if(e.target.textContent==="蔬菜"){
-        console.log("點到蔬菜區了喔")
-        showData = allData.filter(function(item){
-            return item.種類代碼 ==="N04"
-        })
-        renderData(showData);
-
-    }else if(e.target.textContent==="水果"){
-        console.log("點到水果區了喔")
-        showData = allData.filter(function(item){
-            return item.種類代碼 ==="N05"
-        })
-        renderData(showData);
-    }else if(e.target.textContent==="花卉"){
-        console.log("點到花卉區了喔")
-        showData = allData.filter(function(item){
-            return item.種類代碼 ==="N06"
-        })
-        renderData(showData);
     }
-    
+ 
+    const type = e.target.getAttribute("data-type")
+ 
+    //清空搜尋框，標題改成目前的分類
+    crop.value = "";
+    showResult.textContent = `目前顯示：${e.target.textContent}類`
+ 
+    showData = allData.filter(function(item){
+        return item.種類代碼 === type
+    })
+    renderData(showData);
 })
 
 //按下顯示更多按鈕
@@ -137,6 +160,12 @@ crop.addEventListener("keydown",function(e){
 //排序功能
 //1. 按表頭排序
 function sortData(key,order){
+    
+    //還沒選分類或搜尋時，沒有資料可以排，直接結束
+    if(showData.length === 0){
+            return
+        }
+
     showData.sort(function(a,b){
         if(order==="up"){
             return a[key]-b[key] //由小到大
